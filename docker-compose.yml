@@ -1,0 +1,44 @@
+version: '3'
+
+services:
+  scheduler:
+    image: scheduler
+    container_name: scheduler
+    build:
+      context: .
+    depends_on:
+      - scheduler-db
+    ports:
+      - '5009:5009'
+    env_file:
+      - ./env/scheduler.env
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "5"
+
+  scheduler-db:
+    image: postgres
+    container_name: scheduler-db
+    ports:
+      - '5439:5432'
+    volumes:
+      - pgdata_scheduler:/var/lib/postgresql/data
+      - pgconf_scheduler:/etc/postgresql
+      - pglog_scheduler:/var/log/postgresql
+    env_file:
+      - ./env/scheduler-db.env
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+volumes:
+  pgdata_scheduler:
+    driver: local
+  pgconf_scheduler:
+    driver: local
+  pglog_scheduler:
+    driver: local
